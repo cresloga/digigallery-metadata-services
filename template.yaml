@@ -21,7 +21,7 @@ Resources:
           Type: S3
           Properties:
             Bucket: !Ref SrcBucket
-            Events: s3:ObjectRemoved:*
+            Events: s3:ObjectCreated:*
   getMetadata:
     Type: AWS::Serverless::Function
     Properties:
