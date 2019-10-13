@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  addMetadata:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: addMetadataV2
+      Description: Function that adds metadata for a fileName into DynamoDB table
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Timeout: 60
+      CodeUri: ./addmetadata/
+      Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      Environment:
+        Variables:
+          DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
+          DB_ENDPOINT: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_ENDPOINT:1}}'
+          DB_TABLE_NAME: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_TABLE:1}}'
+      Events:
+        AddPhotoEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref SrcBucket
+            Events: s3:ObjectRemoved:*
+  getMetadata:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getMetadataV2
+      Description: Function that gets metadata for a fileName into DynamoDB table
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Timeout: 60
+      CodeUri: ./getmetadata/
+      Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      Environment:
+        Variables:
+          DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
+          DB_ENDPOINT: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_ENDPOINT:1}}'
+          DB_TABLE_NAME: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_TABLE:1}}'
+      Events:
+        metadata:
+          Type: Api
+          Properties:
+            Path: /metadata/{fileName}
+            Method: get
+            RestApiId: !Ref metadataApi
+  deleteMetadata:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: deleteMetadataV2
+      Description: Function that deletes metadata for a fileName into DynamoDB table
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Timeout: 60
+      CodeUri: ./deletemetadata/
+      Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      Environment:
+        Variables:
+          DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
+          DB_ENDPOINT: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_ENDPOINT:1}}'
+          DB_TABLE_NAME: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_TABLE:1}}'
+      Events:
+        DeletePhotoEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref SrcBucket
+            Events: s3:ObjectRemoved:*
+  LambdaRoleToAccessDynamoDb:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+          - Effect: Allow
+            Principal:
+              Service:
+              - 'lambda.amazonaws.com'
+            Action: 
+              - 'sts:AssumeRole'
+  SrcBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: digigallery-prod
+  metadataApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: metadataV2
+      StageName: prod
+      Cors:
+        AllowOrigin: "'*'"

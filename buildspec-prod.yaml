@@ -1,0 +1,15 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+        nodejs: 8
+  build:
+    commands:
+      - npm install time
+      - export BUCKET=digigallery-build-bucket-prod
+      - aws cloudformation package --template-file template.yaml --output-template-file outputtemplate.yaml --s3-bucket $BUCKET --s3-prefix digigallery-metadata
+artifacts:
+  type: zip
+  files:
+    - '**/*'
+  name: code
