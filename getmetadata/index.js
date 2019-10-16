@@ -19,13 +19,33 @@ exports.handler = function(event, context,callback) {
             fileName: fileName
         }
     };
+
+    var responseBody = {};  
+	var responseStatus = 200;
+    var responseContentType = "application/json";
+    
     docClient.get(params, function(err, data) {
         if (err) {
             console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
-            callback(null, err);
+            responseBody = err;
+            responseStatus = 417;
         } else {
             console.log("Read item:", JSON.stringify(data, null, 2));
-            callback(null, data);
+            responseBody = data;            
         }
+        respond(responseStatus, responseContentType, responseBody, callback);
     });
+}
+
+function respond(responseStatus, responseContentType, responseBody, callback){
+	var response = {
+		"statusCode": responseStatus,
+		"headers": {
+			"Content-Type": responseContentType
+		},
+		"body": JSON.stringify(responseBody),
+		"isBase64Encoded": false
+	}
+	console.log(response);
+	callback(null,response);
 }
