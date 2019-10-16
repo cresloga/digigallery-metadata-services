@@ -1,11 +1,11 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb');
+var AWS = require("aws-sdk");
 
-var connConfig = {
+AWS.config.update({
   region: process.env.DB_REGION,
   endpoint: process.env.DB_ENDPOINT
-};
+});
 
-var docClient = new DynamoDB(connConfig);
+var docClient = new AWS.DynamoDB.DocumentClient();
 
 
 exports.handler = function(event, context,callback) {
