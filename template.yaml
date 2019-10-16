@@ -1,6 +1,25 @@
 AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Resources:
+  extractMetadata:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: extractMetadataV2
+      Description: Function that adds metadata for a fileName into DynamoDB table
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Timeout: 60
+      CodeUri: ./extractmetadata/
+      Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      Environment:
+        Variables:
+          S3_BUCKET: '{{resolve:ssm:DIGIGALLERY_PHOTO_BUCKET:1}}'
+      Events:
+        AddPhotoEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref SrcBucket
+            Events: s3:ObjectCreated:*
   addMetadata:
     Type: AWS::Serverless::Function
     Properties:

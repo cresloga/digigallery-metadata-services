@@ -12,7 +12,7 @@ exports.handler = function(event, context,callback) {
     console.log("Event Received : "+JSON.stringify(event));
 
     var table = process.env.DB_TABLE_NAME;
-    var fileName = event.body.fileName;    
+    var fileName = event.pathParameters.fileName;    
     var params = {
         TableName:table,
         Key:{
