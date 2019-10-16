@@ -1,4 +1,4 @@
-const {DynamoDB} = require('@aws-sdk/client-dynamodb-v2-node');
+const DynamoDB = require('aws-sdk/clients/dynamodb');
 
 var connConfig = {
   region: process.env.DB_REGION,
