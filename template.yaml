@@ -35,12 +35,6 @@ Resources:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
           DB_ENDPOINT: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_ENDPOINT:1}}'
           DB_TABLE_NAME: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_TABLE:1}}'
-      Events:
-        AddPhotoEvent:
-          Type: S3
-          Properties:
-            Bucket: !Ref SrcBucket
-            Events: s3:ObjectCreated:*
   getMetadata:
     Type: AWS::Serverless::Function
     Properties:
