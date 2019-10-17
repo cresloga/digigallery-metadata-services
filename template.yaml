@@ -83,6 +83,7 @@ Resources:
     Properties:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       AssumeRolePolicyDocument: 
         Version: '2012-10-17'
         Statement: 
