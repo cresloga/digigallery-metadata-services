@@ -1,22 +1,19 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb');
+var AWS = require("aws-sdk");
 
-var connConfig = {
+AWS.config.update({
   region: process.env.DB_REGION,
   endpoint: process.env.DB_ENDPOINT
-};
+});
 
-var docClient = new DynamoDB(connConfig).DocumentClient();
+var docClient = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = function(event, context,callback) {
+exports.handler = function(event, context, callback) {
 
     console.log("Event Received : "+JSON.stringify(event));
 
     var table = process.env.DB_TABLE_NAME;
     
     var fileName;
-    if(event.body != null)
-        fileName = event.body.fileName;    
-
     if(fileName == null && event.Records[0]!=null)
         fileName = event.Records[0].s3.object.key;
 
