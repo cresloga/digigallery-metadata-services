@@ -1,8 +1,9 @@
 const aws = require('aws-sdk');
-const S3_BUCKET = process.env.S3_BUCKET;
+const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL;
 
 exports.handler = function(event, context,callback) {
-    console.log("Event Received : "+JSON.stringify(event));  	
+    console.log("Event Received : "+JSON.stringify(event)); 
+	console.log("SQS URL : "+SQS_QUEUE_URL); 	
 	var fileName = event.body.fileName;
 	console.log("File Name :"+fileName);
 	var params = {

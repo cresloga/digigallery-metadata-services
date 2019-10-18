@@ -13,13 +13,15 @@ Resources:
       Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
       Environment:
         Variables:
-          S3_BUCKET: '{{resolve:ssm:DIGIGALLERY_PHOTO_BUCKET:1}}'
+          SQS_QUEUE_URL: !Ref newObjectMsgQueue
       Events:
         AddPhotoEvent:
           Type: S3
           Properties:
             Bucket: !Ref SrcBucket
             Events: s3:ObjectCreated:*
+  newObjectMsgQueue:
+    Type: AWS::SQS::Queue
   addMetadata:
     Type: AWS::Serverless::Function
     Properties:
