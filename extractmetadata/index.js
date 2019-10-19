@@ -23,7 +23,7 @@ exports.handler = function(event, context,callback) {
 }
 
 function getRekognitionLabels(params,callback){
-	console.log("calling Rekognition");
+	console.log("calling Rekognition with params : "+params);
 	var rekognition = new aws.Rekognition();
 	 rekognition.detectLabels(params, function(err, data) {
 	   if (err){
