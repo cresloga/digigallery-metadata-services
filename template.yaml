@@ -43,6 +43,7 @@ Resources:
           Type: SQS
           Properties:
             Queue: !GetAtt newObjectMsgQueue.Arn
+            BatchSize: 1
   getMetadata:
     Type: AWS::Serverless::Function
     Properties:
