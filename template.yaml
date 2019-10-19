@@ -114,6 +114,7 @@ Resources:
   msgQueuePolicy:
     Type: AWS::IAM::Policy
     Properties:
+      PolicyName: SqsPostMsgQueuePolicy
       Roles:
         - !Ref extractMetadataRole
       PolicyDocument:
