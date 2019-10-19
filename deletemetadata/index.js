@@ -14,7 +14,7 @@ exports.handler = function(event, context, callback) {
     var table = process.env.DB_TABLE_NAME;
     
     var fileName;
-    if(fileName == null && event.Records[0]!=null)
+    if(event.Records[0]!=null)
         fileName = event.Records[0].s3.object.key;
 
     var params = {

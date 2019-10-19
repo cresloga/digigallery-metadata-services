@@ -4,7 +4,7 @@ const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL;
 exports.handler = function(event, context,callback) {
     console.log("Event Received : "+JSON.stringify(event)); 
 	var fileName, bucketName;
-    if(fileName == null && event.Records[0]!=null) {
+    if(event.Records[0]!=null) {
 		fileName = event.Records[0].s3.object.key;
 		bucketName = event.Records[0].s3.bucket.name;
 	}
@@ -24,7 +24,7 @@ exports.handler = function(event, context,callback) {
 
 function getRekognitionLabels(params,callback){
 	console.log("calling Rekognition");
-	var rekognition = new aws.Rekognition(awsApiUser);
+	var rekognition = new aws.Rekognition();
 	 rekognition.detectLabels(params, function(err, data) {
 	   if (err){
 	   	console.log(err, err.stack); // an error occurred
