@@ -101,8 +101,7 @@ Resources:
     Properties:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonRekognitionFullAccess
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - !GetAtt msgQueuePolicy.Arn
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole        
       AssumeRolePolicyDocument: 
         Version: '2012-10-17'
         Statement: 
@@ -115,6 +114,8 @@ Resources:
   msgQueuePolicy:
     Type: AWS::IAM::Policy
     Properties:
+      Roles:
+        - !Ref extractMetadataRole
       PolicyDocument:
         Statement:
           - 
