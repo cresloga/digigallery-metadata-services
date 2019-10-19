@@ -23,6 +23,8 @@ Resources:
             Events: s3:ObjectCreated:*
   newObjectMsgQueue:
     Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 90
   addMetadata:
     Type: AWS::Serverless::Function
     Properties:
