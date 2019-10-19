@@ -19,21 +19,28 @@ exports.handler = function(event, context,callback) {
 	  MaxLabels: 5, 
 	  MinConfidence: 70
 	 };
-	getRekognitionLabels(params,callback);
+	getRekognitionLabels(params).then( function(data){
+		console.log(data);
+		callback(null,JSON.parse(JSON.stringify(data,null,2)));
+	}, function(error){
+		console.log(error, error.stack); // an error occurred
+	   	callback(null, JSON.parse(JSON.stringify(error,null,2)));
+	});
 }
 
 function getRekognitionLabels(params,callback){
 	console.log("calling Rekognition with params : "+params);
-	var rekognition = new aws.Rekognition();
-	 rekognition.detectLabels(params, function(err, data) {
-	   if (err){
-	   	console.log(err, err.stack); // an error occurred
-	   	callback(null, JSON.parse(JSON.stringify(err,null,2))); 
-	   } 
-	   else                // successful response
-	   {
-	   	console.log(data);
-	   	callback(null,JSON.parse(JSON.stringify(data,null,2)));           
-	   }
-	 });
+	return new Promise((resolve, reject) => {
+		var rekognition = new aws.Rekognition();
+		rekognition.detectLabels(params, function(err, data) {
+		if (err){
+			reject(err);
+		} 
+		else                // successful response
+		{
+			resolve(data);    
+		}
+		});
+	});
+	
 }
