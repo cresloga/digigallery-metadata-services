@@ -113,16 +113,16 @@ Resources:
             Action: 
               - 'sts:AssumeRole'
   msgQueuePolicy:
-    Type: AWS::SQS::QueuePolicy
+    Type: AWS::IAM::Policy
     Properties:
       PolicyDocument:
         Statement:
-          Effect: Allow
-          Principal: "*"
-          Action: 
-            - 'sqs:SendMessage'
-            - 'sqs:GetQueueUrl'
-          Resource: !Ref newObjectMsgQueue
+          - 
+            Effect: "Allow"            
+            Action: 
+              - "sqs:SendMessage"
+              - "sqs:GetQueueUrl"
+            Resource: "*"
   SrcBucket:
     Type: AWS::S3::Bucket
     Properties:
