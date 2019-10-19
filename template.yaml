@@ -14,6 +14,7 @@ Resources:
       Environment:
         Variables:
           SQS_QUEUE_URL: !Ref newObjectMsgQueue
+          S3_REGION: '{{resolve:ssm:DIGIGALLERY_PHOTO_BUCKET_REGION:1}}'
       Events:
         AddPhotoEvent:
           Type: S3

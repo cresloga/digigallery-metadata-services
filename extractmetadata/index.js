@@ -1,6 +1,10 @@
 const aws = require('aws-sdk');
 const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL;
 
+var sqs = new AWS.SQS({
+    region: process.env.S3_REGION;
+});
+
 exports.handler = function(event, context,callback) {
     console.log("Event Received : "+JSON.stringify(event)); 
 	var fileName, bucketName;
@@ -21,6 +25,11 @@ exports.handler = function(event, context,callback) {
 	 };
 	getRekognitionLabels(params).then( function(data){
 		console.log(data);
+		let message = {
+			fileName: params.Image.S3Object.Name,
+			Labels: data.Labels
+		};
+		postMessage(message);
 		callback(null,JSON.parse(JSON.stringify(data,null,2)));
 	}, function(error){
 		console.log(error, error.stack); // an error occurred
@@ -33,14 +42,28 @@ function getRekognitionLabels(params,callback){
 	return new Promise((resolve, reject) => {
 		var rekognition = new aws.Rekognition();
 		rekognition.detectLabels(params, function(err, data) {
-		if (err){
-			reject(err);
-		} 
-		else                // successful response
-		{
-			resolve(data);    
-		}
+			if (err){
+				reject(err);
+			} 
+			else                // successful response
+			{
+				resolve(data);    
+			}
 		});
 	});
 	
+}
+
+function postMessage(message) {
+	var params = {
+        MessageBody: JSON.stringify(message),
+        QueueUrl: SQS_QUEUE_URL
+    };
+    sqs.sendMessage(params, function(err, data) {
+        if (err) {
+            console.log('error:', "Fail Send Message" + err);            
+        } else {
+            console.log('data:', data.MessageId);           
+        }
+    });
 }
