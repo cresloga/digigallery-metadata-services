@@ -10,7 +10,7 @@ Resources:
       Runtime: nodejs8.10
       Timeout: 60
       CodeUri: ./extractmetadata/
-      Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      Role: !GetAtt extractMetadataRole.Arn
       Environment:
         Variables:
           SQS_QUEUE_URL: !Ref newObjectMsgQueue
@@ -85,6 +85,21 @@ Resources:
     Properties:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+          - Effect: Allow
+            Principal:
+              Service:
+              - 'lambda.amazonaws.com'
+            Action: 
+              - 'sts:AssumeRole'
+  extractMetadataRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonRekognitionFullAccess
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       AssumeRolePolicyDocument: 
         Version: '2012-10-17'
