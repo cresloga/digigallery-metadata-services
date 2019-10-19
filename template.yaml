@@ -32,7 +32,7 @@ Resources:
       Runtime: nodejs8.10
       Timeout: 60
       CodeUri: ./addmetadata/
-      Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      Role: !GetAtt addMetadataRole.Arn
       Environment:
         Variables:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
@@ -101,6 +101,22 @@ Resources:
               - 'lambda.amazonaws.com'
             Action: 
               - 'sts:AssumeRole'
+  addMetadataRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+          - Effect: Allow
+            Principal:
+              Service:
+              - 'lambda.amazonaws.com'
+            Action: 
+              - 'sts:AssumeRole'
   extractMetadataRole:
     Type: AWS::IAM::Role
     Properties:
@@ -116,10 +132,10 @@ Resources:
               - 'lambda.amazonaws.com'
             Action: 
               - 'sts:AssumeRole'
-  msgQueuePolicy:
+  postMsgToQueuePolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: SqsPostMsgQueuePolicy
+      PolicyName: postMsgToQueuePolicy
       Roles:
         - !Ref extractMetadataRole
       PolicyDocument:
@@ -129,7 +145,7 @@ Resources:
             Action: 
               - "sqs:SendMessage"
               - "sqs:GetQueueUrl"
-            Resource: "*"
+            Resource: "*"     
   SrcBucket:
     Type: AWS::S3::Bucket
     Properties:
