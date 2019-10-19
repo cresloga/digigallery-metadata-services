@@ -3,13 +3,16 @@ const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL;
 
 exports.handler = function(event, context,callback) {
     console.log("Event Received : "+JSON.stringify(event)); 
-	console.log("SQS URL : "+SQS_QUEUE_URL); 	
-	var fileName = event.body.fileName;
-	console.log("File Name :"+fileName);
+	var fileName, bucketName;
+    if(fileName == null && event.Records[0]!=null) {
+		fileName = event.Records[0].s3.object.key;
+		bucketName = event.Records[0].s3.bucket.name;
+	}
+        
 	var params = {
 	  Image: {
 	   S3Object: {
-	    Bucket: S3_BUCKET, 
+	    Bucket: bucketName, 
 	    Name: fileName
 	   }
 	  }, 
@@ -29,16 +32,8 @@ function getRekognitionLabels(params,callback){
 	   } 
 	   else                // successful response
 	   {
-	   		//var resData = JSON.parse(data);
-	   		//console.log("\n\n\n"+data.Labels.length);
-	   		console.log(data);
-	   		callback(null,JSON.parse(JSON.stringify(data,null,2)));           
+	   	console.log(data);
+	   	callback(null,JSON.parse(JSON.stringify(data,null,2)));           
 	   }
 	 });
 }
-
-
-
-
-
-
