@@ -107,7 +107,7 @@ Resources:
     Properties:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
-        - arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       AssumeRolePolicyDocument: 
         Version: '2012-10-17'
@@ -146,7 +146,7 @@ Resources:
             Action: 
               - "sqs:SendMessage"
               - "sqs:GetQueueUrl"
-            Resource: "*"     
+            Resource: "*"  
   SrcBucket:
     Type: AWS::S3::Bucket
     Properties:
