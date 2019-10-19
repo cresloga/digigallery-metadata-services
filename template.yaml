@@ -102,6 +102,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonRekognitionFullAccess
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !GetAtt msgQueuePolicy.Arn
       AssumeRolePolicyDocument: 
         Version: '2012-10-17'
         Statement: 
@@ -111,6 +112,17 @@ Resources:
               - 'lambda.amazonaws.com'
             Action: 
               - 'sts:AssumeRole'
+  msgQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          Effect: Allow
+          Principal: "*"
+          Action: 
+            - 'sqs:SendMessage'
+            - 'sqs:GetQueueUrl'
+          Resource: !Ref newObjectMsgQueue
   SrcBucket:
     Type: AWS::S3::Bucket
     Properties:
