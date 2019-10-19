@@ -38,6 +38,11 @@ Resources:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
           DB_ENDPOINT: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_ENDPOINT:1}}'
           DB_TABLE_NAME: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_TABLE:1}}'
+      Events:
+        SqsJobQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt newObjectMsgQueue.Arn
   getMetadata:
     Type: AWS::Serverless::Function
     Properties:
