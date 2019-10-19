@@ -2,7 +2,7 @@ const aws = require('aws-sdk');
 const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL;
 
 var sqs = new AWS.SQS({
-    region: process.env.S3_REGION;
+    region: process.env.S3_REGION
 });
 
 exports.handler = function(event, context,callback) {
