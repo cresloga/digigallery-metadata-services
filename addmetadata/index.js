@@ -10,8 +10,9 @@ var docClient = new AWS.DynamoDB.DocumentClient();
 exports.handler = function(event, context,callback) {
     console.log("Event Received : "+JSON.stringify(event));    
     var table = process.env.DB_TABLE_NAME;
-    var fileName = event.body.fileName;
-    var labels =  event.body.Labels;
+    var requestPayload = JSON.parse(event.Records[0].body);
+    var fileName = requestPayload.fileName;
+    var labels =  requestPayload.Labels;
 
     var params = {
         TableName:table,
