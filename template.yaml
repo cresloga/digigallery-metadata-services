@@ -152,7 +152,7 @@ Resources:
   SrcBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: digigallery-prod
+      BucketName: '{{resolve:ssm:DIGIGALLERY_PHOTO_BUCKET}}'
   metadataApi:
     Type: AWS::Serverless::Api
     Properties:
