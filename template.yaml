@@ -160,3 +160,7 @@ Resources:
       StageName: prod
       Cors:
         AllowOrigin: "'*'"
+Outputs:
+  metadataApiDetails:
+    Description: "API Prod stage endpoint"
+    Value: !Sub "https://${metadataApi}.execute-api.${AWS::Region}.amazonaws.com/prod/metadata"
