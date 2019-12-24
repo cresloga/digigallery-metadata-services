@@ -182,7 +182,7 @@ Resources:
     Properties:
       PolicyName: postMsgToQueuePolicy
       Roles:
-        - !Ref extractMetadataRole
+        - !Ref extractMetadataRoleV2
       PolicyDocument:
         Statement:
           - 
