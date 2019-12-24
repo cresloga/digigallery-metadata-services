@@ -10,7 +10,8 @@ Resources:
       Runtime: nodejs8.10
       Timeout: 60
       CodeUri: ./extractmetadata/
-      Role: !GetAtt extractMetadataRole.Arn
+      Role: !GetAtt extractMetadataRoleV2.Arn
+      Tracing: Active
       Environment:
         Variables:
           SQS_QUEUE_URL: !Ref newObjectMsgQueue
@@ -21,6 +22,8 @@ Resources:
           Properties:
             Bucket: !Ref SrcBucket
             Events: s3:ObjectCreated:*
+    DependsOn:
+    - extractMetadataRoleV2
   newObjectMsgQueue:
     Type: AWS::SQS::Queue
     Properties:
@@ -34,7 +37,8 @@ Resources:
       Runtime: nodejs8.10
       Timeout: 60
       CodeUri: ./addmetadata/
-      Role: !GetAtt addMetadataRole.Arn
+      Role: !GetAtt addMetadataRoleV2.Arn
+      Tracing: Active
       Environment:
         Variables:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
@@ -46,6 +50,8 @@ Resources:
           Properties:
             Queue: !GetAtt newObjectMsgQueue.Arn
             BatchSize: 1
+    DependsOn:
+    - addMetadataRoleV2
   getMetadata:
     Type: AWS::Serverless::Function
     Properties:
@@ -55,7 +61,8 @@ Resources:
       Runtime: nodejs8.10
       Timeout: 60
       CodeUri: ./getmetadata/
-      Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      Role: !GetAtt LambdaRoleToAccessDynamoDbV2.Arn
+      Tracing: Active
       Environment:
         Variables:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
@@ -68,6 +75,8 @@ Resources:
             Path: /metadata/{fileName}
             Method: get
             RestApiId: !Ref metadataApi
+    DependsOn:
+    - LambdaRoleToAccessDynamoDbV2
   deleteMetadata:
     Type: AWS::Serverless::Function
     Properties:
@@ -77,7 +86,8 @@ Resources:
       Runtime: nodejs8.10
       Timeout: 60
       CodeUri: ./deletemetadata/
-      Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      Role: !GetAtt LambdaRoleToAccessDynamoDbV2.Arn
+      Tracing: Active
       Environment:
         Variables:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
@@ -89,7 +99,7 @@ Resources:
           Properties:
             Bucket: !Ref SrcBucket
             Events: s3:ObjectRemoved:*
-  LambdaRoleToAccessDynamoDb:
+  LambdaRoleToAccessDynamoDbV2:
     Type: AWS::IAM::Role
     Properties:
       ManagedPolicyArns:
@@ -104,7 +114,19 @@ Resources:
               - 'lambda.amazonaws.com'
             Action: 
               - 'sts:AssumeRole'
-  addMetadataRole:
+      Policies:
+      - PolicyName: digigallery-xray-lambda-policy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Action:
+            - "xray:PutTraceSegments"
+            - "xray:PutTelemetryRecords"
+            Effect: Allow
+            Resource: "*"
+    DependsOn:
+    - LambdaRoleToAccessDynamoDbV2
+  addMetadataRoleV2:
     Type: AWS::IAM::Role
     Properties:
       ManagedPolicyArns:
@@ -120,7 +142,17 @@ Resources:
               - 'lambda.amazonaws.com'
             Action: 
               - 'sts:AssumeRole'
-  extractMetadataRole:
+      Policies:
+      - PolicyName: digigallery-xray-lambda-policy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Action:
+            - "xray:PutTraceSegments"
+            - "xray:PutTelemetryRecords"
+            Effect: Allow
+            Resource: "*"
+  extractMetadataRoleV2:
     Type: AWS::IAM::Role
     Properties:
       ManagedPolicyArns:
@@ -135,6 +167,16 @@ Resources:
               - 'lambda.amazonaws.com'
             Action: 
               - 'sts:AssumeRole'
+      Policies:
+      - PolicyName: digigallery-xray-lambda-policy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Action:
+            - "xray:PutTraceSegments"
+            - "xray:PutTelemetryRecords"
+            Effect: Allow
+            Resource: "*"
   postMsgToQueuePolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -158,6 +200,7 @@ Resources:
     Properties:
       Name: metadataV2
       StageName: prod
+      TracingEnabled: true
       Cors:
         AllowOrigin: "'*'"
 Outputs:
