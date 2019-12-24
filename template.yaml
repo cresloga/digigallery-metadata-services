@@ -11,6 +11,8 @@ Resources:
       Timeout: 60
       CodeUri: ./extractmetadata/
       Role: !GetAtt extractMetadataRole.Arn
+      TracingEnabled: true
+      Tracing: Active
       Environment:
         Variables:
           SQS_QUEUE_URL: !Ref newObjectMsgQueue
@@ -35,6 +37,8 @@ Resources:
       Timeout: 60
       CodeUri: ./addmetadata/
       Role: !GetAtt addMetadataRole.Arn
+      TracingEnabled: true
+      Tracing: Active
       Environment:
         Variables:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
@@ -56,6 +60,8 @@ Resources:
       Timeout: 60
       CodeUri: ./getmetadata/
       Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      TracingEnabled: true
+      Tracing: Active
       Environment:
         Variables:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
@@ -78,6 +84,8 @@ Resources:
       Timeout: 60
       CodeUri: ./deletemetadata/
       Role: !GetAtt LambdaRoleToAccessDynamoDb.Arn
+      TracingEnabled: true
+      Tracing: Active
       Environment:
         Variables:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
@@ -158,6 +166,8 @@ Resources:
     Properties:
       Name: metadataV2
       StageName: prod
+      TracingEnabled: true
+      Tracing: Active
       Cors:
         AllowOrigin: "'*'"
 Outputs:
