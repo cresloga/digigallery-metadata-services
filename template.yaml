@@ -99,6 +99,8 @@ Resources:
           Properties:
             Bucket: !Ref SrcBucket
             Events: s3:ObjectRemoved:*
+    DependsOn:
+    - LambdaRoleToAccessDynamoDbV2
   LambdaRoleToAccessDynamoDbV2:
     Type: AWS::IAM::Role
     Properties:
