@@ -9,7 +9,7 @@
     "author": "Loganathan Murugesan",
     "license": "ISC",
     "dependencies": {    
-      "aws-xray-sdk": "^2.2.0"
+      "aws-xray-sdk": "^2.5.0"
     }
   }
   
