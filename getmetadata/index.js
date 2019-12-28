@@ -1,4 +1,4 @@
-const aws = require('aws-sdk');
+const AWS = require('aws-sdk');
 
 AWS.config.update({
   region: process.env.DB_REGION,
