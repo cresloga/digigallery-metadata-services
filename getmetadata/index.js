@@ -1,12 +1,11 @@
-var AWSXRay = require('aws-xray-sdk');
-var AWS = AWSXRay.captureAWS(require('aws-sdk'));
+const aws = require('aws-sdk');
 
 AWS.config.update({
   region: process.env.DB_REGION,
   endpoint: process.env.DB_ENDPOINT
 });
 
-var docClient = AWSXRay.captureAWSClient(new AWS.DynamoDB());
+var docClient = new AWS.DynamoDB.DocumentClient();
 
 
 exports.handler = function(event, context,callback) {
