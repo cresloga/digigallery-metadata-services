@@ -7,10 +7,6 @@ phases:
   install:
     runtime-versions:
         nodejs: 10
-  pre_build:
-    commands:
-      - rm -f package-lock.json
-      - npm install aws-xray-sdk
   build:
     commands:
       - npm install time
