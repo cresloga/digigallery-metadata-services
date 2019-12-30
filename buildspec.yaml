@@ -9,7 +9,7 @@ phases:
         nodejs: 10
   pre_build:
     commands:
-      - npm install     
+      - npm install aws-xray-sdk --save     
   build:
     commands:      
       - export BUCKET=$DIGIGALLERY_BUILD_BUCKET_NAME
