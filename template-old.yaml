@@ -1,22 +1,6 @@
 AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  newObjectNotification:
-    Type: AWS::SNS::Topic
-    Properties:
-      DisplayName: NewMetadata
-      TopicName: NewMetadata
-      Subscription:
-        - Protocol: lambda
-          Endpoint: !GetAtt addMetadata.Arn
-
-  FunctionInvokePermissionToSNS:
-    Type: 'AWS::Lambda::Permission'
-    Properties:
-      Action: 'lambda:InvokeFunction'
-      FunctionName: !Ref addMetadata
-      Principal: sns.amazonaws.com 
-        
   extractMetadata:
     Type: AWS::Serverless::Function
     Properties:
@@ -30,7 +14,7 @@ Resources:
       Tracing: Active
       Environment:
         Variables:
-          SNS_TOPIC_ARN: !GetAtt newObjectNotification.Arn
+          SQS_QUEUE_URL: !Ref newObjectMsgQueue
           S3_REGION: '{{resolve:ssm:DIGIGALLERY_PHOTO_BUCKET_REGION:1}}'
       Events:
         AddPhotoEvent:
@@ -40,7 +24,10 @@ Resources:
             Events: s3:ObjectCreated:*
     DependsOn:
     - extractMetadataRoleV2
-  
+  newObjectMsgQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 90
   addMetadata:
     Type: AWS::Serverless::Function
     Properties:
@@ -50,15 +37,21 @@ Resources:
       Runtime: nodejs10.x
       Timeout: 60
       CodeUri: ./addmetadata/
-      Role: !GetAtt LambdaRoleToAccessDynamoDbV2.Arn
+      Role: !GetAtt addMetadataRoleV2.Arn
       Tracing: Active
       Environment:
         Variables:
           DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
           DB_ENDPOINT: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_ENDPOINT:1}}'
           DB_TABLE_NAME: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_TABLE:1}}'
+      Events:
+        SqsJobQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt newObjectMsgQueue.Arn
+            BatchSize: 1
     DependsOn:
-    - LambdaRoleToAccessDynamoDbV2
+    - addMetadataRoleV2
   getMetadata:
     Type: AWS::Serverless::Function
     Properties:
@@ -134,7 +127,32 @@ Resources:
             Effect: Allow
             Resource: "*"
     
- 
+  addMetadataRoleV2:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+          - Effect: Allow
+            Principal:
+              Service:
+              - 'lambda.amazonaws.com'
+            Action: 
+              - 'sts:AssumeRole'
+      Policies:
+      - PolicyName: digigallery-xray-lambda-policy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Action:
+            - "xray:PutTraceSegments"
+            - "xray:PutTelemetryRecords"
+            Effect: Allow
+            Resource: "*"
   extractMetadataRoleV2:
     Type: AWS::IAM::Role
     Properties:
@@ -160,10 +178,10 @@ Resources:
             - "xray:PutTelemetryRecords"
             Effect: Allow
             Resource: "*"
-  postMsgToTopicPolicy:
+  postMsgToQueuePolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: postMsgToTopicPolicy
+      PolicyName: postMsgToQueuePolicy
       Roles:
         - !Ref extractMetadataRoleV2
       PolicyDocument:
@@ -171,8 +189,9 @@ Resources:
           - 
             Effect: "Allow"            
             Action: 
-              - "sns:Publish"
-            Resource: !Ref newObjectNotification
+              - "sqs:SendMessage"
+              - "sqs:GetQueueUrl"
+            Resource: "*"  
   SrcBucket:
     Type: AWS::S3::Bucket
     Properties:

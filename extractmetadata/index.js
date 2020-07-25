@@ -1,11 +1,11 @@
 const aws = require('aws-sdk');
-const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL;
+const SNS_TOPIC_ARN = process.env.SNS_TOPIC_ARN;
 
-var sqs = new aws.SQS({
-    region: process.env.S3_REGION
-});
+aws.config.region = process.env.S3_REGION;
 
-exports.handler = function(event, context,callback) {
+var sns = new aws.SNS();
+
+exports.handler = function(event, context, callback) {
     console.log("Event Received : "+JSON.stringify(event)); 
 	var fileName, bucketName;
     if(event.Records[0]!=null) {
@@ -56,14 +56,15 @@ function getRekognitionLabels(params,callback){
 
 function postMessage(message) {
 	var params = {
-        MessageBody: JSON.stringify(message),
-        QueueUrl: SQS_QUEUE_URL
+        Message: JSON.stringify(message),
+        TopicArn: SNS_TOPIC_ARN;
     };
-    sqs.sendMessage(params, function(err, data) {
+	sns.publish(params, function(err, data) {
         if (err) {
-            console.log('error:', "Fail Send Message" + err);            
-        } else {
-            console.log('data:', data.MessageId);           
+            console.log(err.stack);
+            return;
         }
+        console.log('Published to Topic');
+        console.log(data);
     });
 }
