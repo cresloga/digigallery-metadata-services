@@ -30,7 +30,7 @@ Resources:
       Tracing: Active
       Environment:
         Variables:
-          SNS_TOPIC_ARN: !GetAtt newObjectNotification.Arn
+          SNS_TOPIC_ARN: !Ref newObjectNotification
           S3_REGION: '{{resolve:ssm:DIGIGALLERY_PHOTO_BUCKET_REGION:1}}'
       Events:
         AddPhotoEvent:
