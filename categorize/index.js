@@ -20,7 +20,7 @@ exports.handler = function(event, context,callback) {
         var formattedLabel = label.toLowerCase().trim();
         var categoryId = 0;
         var categoryName = '';
-        if (labels[i].Confidence > 99 && categoryId != 0) {
+        if (labels[i].Confidence > 99 && categoryId == 0) {
             switch(formattedLabel) {
                 case "restaurant":
                 case "cafeteria":
@@ -88,11 +88,11 @@ exports.handler = function(event, context,callback) {
             }
         } 
 
-        if(categoryName != '')      
+        if(categoryId != 0)      
             console.log("Label : "+formattedLabel+", Category: "+categoryName);
     }
 
-    if(categoryName != ''){
+    if(categoryId != 0){
         var params = {
             TableName:table,
             Item:{
