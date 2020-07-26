@@ -85,29 +85,37 @@ exports.handler = function(event, context,callback) {
                     categoryId = "11091801";
                     break;
             }
-        }       
-        console.log("Label : "+formattedLabel+", Category: "+categoryName);
+        } 
+
+        if(categoryName)      
+            console.log("Label : "+formattedLabel+", Category: "+categoryName);
     }
 
-    var params = {
-        TableName:table,
-        Item:{
-            fileName: fileName,
-            category: [{
-                "name": categoryName,
-                "id": categoryId
-            }]
-        }
-    };
-
-    console.log("Adding a new item");
-    docClient.put(params, function(err, data) {
-        if (err) {
-            console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-            callback(null, err);
-        } else {
-            console.log("Added item:", JSON.stringify(data, null, 2));
-            callback(null, data);
-        }
-    });
+    if(categoryName){
+        var params = {
+            TableName:table,
+            Item:{
+                fileName: fileName,
+                category: [{
+                    "name": categoryName,
+                    "id": categoryId
+                }]
+            }
+        };
+    
+        console.log("Adding a new item");
+        docClient.put(params, function(err, data) {
+            if (err) {
+                console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+                callback(null, err);
+            } else {
+                console.log("Added item:", JSON.stringify(data, null, 2));
+                callback(null, data);
+            }
+        });
+    }
+    else {
+        callback(null,"No Category Matched.");
+    }
+    
 }
