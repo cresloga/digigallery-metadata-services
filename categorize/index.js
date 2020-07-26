@@ -77,7 +77,13 @@ exports.handler = function(event, context,callback) {
                 case "coast":
                     categoryName = "Luggage Travel Gear";
                     categoryId = "9479199011";
-                    break;	   				
+                    break;	   	
+                case "Musical Instrument":
+                case "Musician":
+                case "Guitar":		
+                    categoryName = "Musical Instruments";
+                    categoryId = "11091801";
+                    break;
             }
         }       
     }
