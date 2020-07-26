@@ -19,7 +19,7 @@ exports.handler = function(event, context,callback) {
         var label = labels[i].Name;
         var formattedLabel = label.toLowerCase().trim();
 
-        if (labels[i].Confidence > 99) {
+        if (labels[i].Confidence > 99 && !categoryId) {
             switch(formattedLabel) {
                 case "restaurant":
                 case "cafeteria":
@@ -78,14 +78,15 @@ exports.handler = function(event, context,callback) {
                     categoryName = "Luggage Travel Gear";
                     categoryId = "9479199011";
                     break;	   	
-                case "Musical Instrument":
-                case "Musician":
-                case "Guitar":		
+                case "musical instrument":
+                case "musician":
+                case "guitar":		
                     categoryName = "Musical Instruments";
                     categoryId = "11091801";
                     break;
             }
         }       
+        console.log("Label : "+formattedLabel+", Category: "+categoryName);
     }
 
     var params = {
