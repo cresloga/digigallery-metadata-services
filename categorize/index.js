@@ -14,12 +14,11 @@ exports.handler = function(event, context,callback) {
     var fileName = requestPayload.fileName;
     var labels =  requestPayload.Labels;
 
-    for(var i=0; i<labels.length; i++) {
-        
+    var categoryId = 0;
+    var categoryName = '';
+    for(var i=0; i<labels.length; i++) {    
         var label = labels[i].Name;
         var formattedLabel = label.toLowerCase().trim();
-        var categoryId = 0;
-        var categoryName = '';
         if (labels[i].Confidence > 99 && categoryId == 0) {
             switch(formattedLabel) {
                 case "restaurant":
