@@ -18,8 +18,8 @@ exports.handler = function(event, context,callback) {
         
         var label = labels[i].Name;
         var formattedLabel = label.toLowerCase().trim();
-
-        if (labels[i].Confidence > 99 && !categoryId) {
+        var categoryId = 0;
+        if (labels[i].Confidence > 99 && categoryId != 0) {
             switch(formattedLabel) {
                 case "restaurant":
                 case "cafeteria":
