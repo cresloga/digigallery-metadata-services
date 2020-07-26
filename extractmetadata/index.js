@@ -57,7 +57,7 @@ function getRekognitionLabels(params,callback){
 function postMessage(message) {
 	var params = {
         Message: JSON.stringify(message),
-        TopicArn: SNS_TOPIC_ARN;
+        TopicArn: SNS_TOPIC_ARN
     };
 	sns.publish(params, function(err, data) {
         if (err) {
