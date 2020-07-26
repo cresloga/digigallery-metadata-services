@@ -9,12 +9,21 @@ Resources:
       Subscription:
         - Protocol: lambda
           Endpoint: !GetAtt addMetadata.Arn
+        - Protocol: lambda
+          Endpoint: !GetAtt categorizePhoto.Arn
 
-  FunctionInvokePermissionToSNS:
+  SNSPermissionToInvokeAddMetadata:
     Type: 'AWS::Lambda::Permission'
     Properties:
       Action: 'lambda:InvokeFunction'
       FunctionName: !Ref addMetadata
+      Principal: sns.amazonaws.com
+
+  SNSPermissionToInvokeCategorizePhoto:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref categorizePhoto
       Principal: sns.amazonaws.com 
         
   extractMetadata:
@@ -59,6 +68,26 @@ Resources:
           DB_TABLE_NAME: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_TABLE:1}}'
     DependsOn:
     - LambdaRoleToAccessDynamoDbV2
+  
+  categorizePhoto:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: categorizePhoto
+      Description: Function that adds shopping category for a fileName into DynamoDB table
+      Handler: index.handler
+      Runtime: nodejs10.x
+      Timeout: 60
+      CodeUri: ./categorize/
+      Role: !GetAtt LambdaRoleToAccessDynamoDbV2.Arn
+      Tracing: Active
+      Environment:
+        Variables:
+          DB_REGION: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_REGION:1}}'
+          DB_ENDPOINT: '{{resolve:ssm:DIGIGALLERY_DYNAMO_DB_ENDPOINT:1}}'
+          DB_TABLE_NAME: '{{resolve:ssm:DIGIGALLERY_CATEGORY_DYNAMO_DB_TABLE:1}}'
+    DependsOn:
+    - LambdaRoleToAccessDynamoDbV2    
+    
   getMetadata:
     Type: AWS::Serverless::Function
     Properties:
