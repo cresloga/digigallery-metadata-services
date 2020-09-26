@@ -212,6 +212,10 @@ Resources:
       Name: metadataV2
       StageName: prod
       TracingEnabled: true
+      MethodSettings:
+      - LoggingLevel: info
+        ResourcePath: '/*'
+        HttpMethod: '*'
 Outputs:
   metadataApiDetails:
     Description: "API Prod stage endpoint"
